@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Security.Claims;
 using api.Data;
 using api.Dtos.Expense;
 using api.Extensions;
@@ -7,8 +5,6 @@ using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
-using api.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -63,20 +59,21 @@ namespace api.controllers
             if (!string.IsNullOrWhiteSpace(query.FilterBy))
             {
                 var weekStart = _dateTime.WeekStart;
-                var weekEnd = weekStart.AddDays(7);
                 var today = _dateTime.Today;
+                var month = _dateTime.Month;
+                var pastMonths = _dateTime.PastMonths;
 
                 if (query.FilterBy.Equals("Week", StringComparison.OrdinalIgnoreCase))
                 {
-                    expenses = expenses.Where(x => x.PurchaseDate >= weekStart && x.PurchaseDate <= weekEnd);
+                    expenses = expenses.Where(x => x.PurchaseDate >= weekStart && x.PurchaseDate <= weekStart.AddDays(7));
                 }
                 if (query.FilterBy.Equals("Month", StringComparison.OrdinalIgnoreCase))
                 {
-                    expenses = expenses.Where(x => x.PurchaseDate.Month == today.Month);
+                    expenses = expenses.Where(x => x.PurchaseDate.Month == month);
                 }
                 if (query.FilterBy.Equals("3 Months", StringComparison.OrdinalIgnoreCase))
                 {
-                    expenses = expenses.Where(x => x.PurchaseDate.Month >= today.AddMonths(-2).Month);
+                    expenses = expenses.Where(x => x.PurchaseDate.Month >= pastMonths);
                 }
             }
             if (query.StartDate != null && query.EndDate != null)
@@ -90,14 +87,13 @@ namespace api.controllers
                 CatagoryName = e.Catagory.Name,
                 PurchaseDate = e.PurchaseDate,
                 Price = e.Price
-
             });
 
             return Ok(await expenses.ToListAsync());
 
         }
         [HttpPost("{catagoryId:int}")]
-        public async Task<IActionResult> CreateExpense([FromRoute] int catagoryId, [FromBody] double price)
+        public async Task<IActionResult> CreateExpense([FromRoute] int catagoryId, [FromBody] decimal price)
         {
 
             if (!ModelState.IsValid)

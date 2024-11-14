@@ -17,5 +17,13 @@ namespace api.Services
         {
             get { return DateTime.Today; }
         }
+        public int Month
+        {
+            get { return DateTime.Today.Month; }
+        }
+        public int PastMonths
+        {
+            get { return DateTime.Today.AddMonths(-2).Month; }
+        }
     }
 }

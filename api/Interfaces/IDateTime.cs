@@ -6,5 +6,7 @@ namespace api.Interfaces
         DateTime Today { get; }
         DateTime WeekStart { get; }
         int Month { get; }
+        int PastMonths { get; }
+
     }
 }
