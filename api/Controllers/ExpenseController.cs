@@ -5,6 +5,7 @@ using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,7 @@ namespace api.controllers
             return Ok(expense.ToExpenseDto());
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllExpenses([FromQuery] QueryObject query)
         {
             var userName = User.GetUserName();
@@ -93,6 +95,7 @@ namespace api.controllers
 
         }
         [HttpPost("{catagoryId:int}")]
+        [Authorize]
         public async Task<IActionResult> CreateExpense([FromRoute] int catagoryId, [FromBody] decimal price)
         {
 
@@ -138,6 +141,7 @@ namespace api.controllers
 
         }
         [HttpPut("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> UpdateExpense([FromRoute] int id, [FromBody] UpdateExpenseDto expenseDto)
         {
 
@@ -168,6 +172,7 @@ namespace api.controllers
 
         }
         [HttpDelete("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> DeleteExpense([FromRoute] int id)
         {
 
