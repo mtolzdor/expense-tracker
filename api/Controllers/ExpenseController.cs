@@ -1,10 +1,13 @@
+using System.Text.Json.Serialization;
 using api.Data;
+using api.Dtos;
 using api.Dtos.Expense;
 using api.Extensions;
 using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
+using api.Repositorys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,29 +19,22 @@ namespace api.controllers
     [ApiController]
     public class ExpenseController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IExpenseRepository _expenseRepo;
         private readonly UserManager<AppUser> _userManager;
-        private readonly IDateTime _dateTime;
 
-        public ExpenseController(ApplicationDbContext context, UserManager<AppUser> userManager, IDateTime dateTime)
+        public ExpenseController(IExpenseRepository expenseRepo, UserManager<AppUser> userManager)
         {
-            _context = context;
+            _expenseRepo = expenseRepo;
             _userManager = userManager;
-            _dateTime = dateTime;
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetExpense(int id)
+        [HttpGet("id")]
+        [Authorize]
+        public async Task<IActionResult> GetExpense([FromRoute] int id)
         {
-            var expense = await _context.Expenses.FindAsync(id);
-
-            if (expense == null)
-            {
-                return BadRequest("expense not found");
-            }
-
-            return Ok(expense.ToExpenseDto());
+            return Ok(await _expenseRepo.GetExpenseByIdAsync(id));
         }
+
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetAllExpenses([FromQuery] QueryObject query)
@@ -51,52 +47,27 @@ namespace api.controllers
                 return BadRequest("Account not found");
             }
 
-            var expenses = _context.Expenses.Where(u => u.UserId == currentUser.Id);
+            var expenses = await _expenseRepo.GetExpensesAsync(currentUser, query);
 
-            if (!string.IsNullOrWhiteSpace(query.CatagoryName))
+            if (expenses == null)
             {
-                expenses = expenses.Where(e => e.Catagory.Name.Contains(query.CatagoryName));
+                return NotFound("Create a new Expense");
             }
 
-            if (!string.IsNullOrWhiteSpace(query.FilterBy))
-            {
-                var weekStart = _dateTime.WeekStart;
-                var today = _dateTime.Today;
-                var month = _dateTime.Month;
-                var pastMonths = _dateTime.PastMonths;
-
-                if (query.FilterBy.Equals("Week", StringComparison.OrdinalIgnoreCase))
-                {
-                    expenses = expenses.Where(x => x.PurchaseDate >= weekStart && x.PurchaseDate <= weekStart.AddDays(7));
-                }
-                if (query.FilterBy.Equals("Month", StringComparison.OrdinalIgnoreCase))
-                {
-                    expenses = expenses.Where(x => x.PurchaseDate.Month == month);
-                }
-                if (query.FilterBy.Equals("3 Months", StringComparison.OrdinalIgnoreCase))
-                {
-                    expenses = expenses.Where(x => x.PurchaseDate.Month >= pastMonths);
-                }
-            }
-            if (query.StartDate != null && query.EndDate != null)
-            {
-                expenses = expenses.Where(x => x.PurchaseDate >= query.StartDate && x.PurchaseDate <= query.EndDate);
-            }
-
-            var expenseModel = expenses.Select(e => new ExpenseDto
+            var expenseDto = expenses.Select(e => new ExpenseDto
             {
                 Id = e.Id,
                 CatagoryName = e.Catagory.Name,
                 PurchaseDate = e.PurchaseDate,
                 Price = e.Price
-            });
+            }).ToList();
 
-            return Ok(await expenses.ToListAsync());
+            return Ok(expenseDto);
 
         }
-        [HttpPost("{catagoryId:int}")]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateExpense([FromRoute] int catagoryId, [FromBody] decimal price)
+        public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseDto expenseDto)
         {
 
             if (!ModelState.IsValid)
@@ -112,32 +83,21 @@ namespace api.controllers
                 return NotFound("Log-in or create an account");
             }
 
-            var catagory = await _context.Catagories.FindAsync(catagoryId);
+            var expenseModel = expenseDto.ToExpenseFromCreate(currentUser.Id);
 
-            if (catagory == null)
-            {
-                return NotFound("Catagory not found");
-            }
-
-            var expense = new Expense
+            /*
+            var expenseModel = new Expense
             {
                 UserId = currentUser.Id,
-                CatagoryId = catagory.Id,
-                PurchaseDate = _dateTime.Now,
-                Price = price
+                CatagoryId = expenseDto.CatagoryId,
+                PurchaseDate = expenseDto.PurchaseDate,
+                Price = expenseDto.Price
             };
+            */
 
-            await _context.AddAsync(expense);
-            await _context.SaveChangesAsync();
-
-            if (expense == null)
-            {
-                return StatusCode(500, "Could not create Expense");
-            }
-            else
-            {
-                return CreatedAtAction(nameof(GetExpense), new { id = expense.Id }, expense.ToExpenseDto());
-            }
+            await _expenseRepo.CreateExpenseAsync(expenseModel);
+            return Ok();
+            //return CreatedAtAction(nameof(GetExpense), new { id = expenseModel.Id }, expenseModel.ToExpenseDto());
 
         }
         [HttpPut("{id:int}")]
@@ -155,18 +115,12 @@ namespace api.controllers
                 return BadRequest(ModelState);
             }
 
-            var expense = await _context.Expenses.FindAsync(id);
+            var expense = await _expenseRepo.UpdateExpenseAsync(id, expenseDto);
 
             if (expense == null)
             {
                 return NotFound();
             }
-
-            expense.CatagoryId = expenseDto.CatagoryId;
-            expense.Price = expenseDto.Price;
-            expense.PurchaseDate = expenseDto.PurchaseDate;
-
-            await _context.SaveChangesAsync();
 
             return NoContent();
 
@@ -175,21 +129,27 @@ namespace api.controllers
         [Authorize]
         public async Task<IActionResult> DeleteExpense([FromRoute] int id)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var expense = await _context.Expenses.FindAsync(id);
+            var userName = User.GetUserName();
+            var currentUser = await _userManager.FindByNameAsync(userName);
+
+            if (currentUser == null)
+            {
+                return BadRequest("Account not found");
+            }
+
+            var expense = _expenseRepo.GetExpenseByIdAsync(id);
 
             if (expense == null)
             {
                 return NotFound();
             }
 
-            _context.Expenses.Remove(expense);
-            await _context.SaveChangesAsync();
+            _expenseRepo.DeleteExpenseAsync(currentUser, id);
 
             return NoContent();
 
