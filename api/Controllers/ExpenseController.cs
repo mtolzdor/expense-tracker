@@ -28,7 +28,7 @@ namespace api.controllers
             _userManager = userManager;
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id:int}")]
         [Authorize]
         public async Task<IActionResult> GetExpense([FromRoute] int id)
         {
