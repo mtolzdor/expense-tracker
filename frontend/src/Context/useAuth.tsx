@@ -1,6 +1,7 @@
 import axios from "axios";
 import React from "react";
 import { createContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 type Props = {
   children: React.ReactNode;
@@ -28,10 +29,11 @@ export const UserProvider = ({ children }: Props) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-    const token = localStorage.getitem("token");
+    const token = localStorage.getItem("token");
 
     if (user && token) {
       setUser(JSON.parse(user));
@@ -82,6 +84,7 @@ export const UserProvider = ({ children }: Props) => {
 
         setToken(data.token!);
         setUser(userObj!);
+        navigate("/");
       }
     } catch (err) {
       console.log(err);
