@@ -1,4 +1,3 @@
-import "./App.css";
 import { Outlet } from "react-router";
 import { UserProvider } from "./Context/useAuth";
 

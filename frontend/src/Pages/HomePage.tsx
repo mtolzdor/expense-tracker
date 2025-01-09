@@ -2,14 +2,16 @@ import { NavLink } from "react-router";
 import { useAuth } from "../Context/useAuth";
 
 export default function HomePage() {
-  const { user } = useAuth();
-
-  console.log(user);
+  const { user, logout } = useAuth();
 
   return (
     <div>
       {user?.userName ? (
-        <h1>Welcome {user?.userName}!</h1>
+        <div>
+          <h1>Welcome {user?.userName}!</h1>
+
+          <button onClick={logout}></button>
+        </div>
       ) : (
         <h1>
           please <NavLink to="/login">Login</NavLink>
