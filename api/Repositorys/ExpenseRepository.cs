@@ -82,7 +82,9 @@ namespace api.Repositorys
                 expenses = expenses.Where(x => x.PurchaseDate >= query.StartDate && x.PurchaseDate <= query.EndDate);
             }
 
-            return await expenses.ToListAsync();
+            var skipNumber = (query.Page - 1) * query.PageSize;
+
+            return await expenses.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
         public async Task<Expense?> UpdateExpenseAsync(int id, UpdateExpenseDto expenseDto)

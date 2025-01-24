@@ -84,7 +84,7 @@ export const UserProvider = ({ children }: Props) => {
 
         setToken(data.token!);
         setUser(userObj!);
-        navigate("/");
+        navigate("/expenses");
       }
     } catch (err) {
       console.log(err);

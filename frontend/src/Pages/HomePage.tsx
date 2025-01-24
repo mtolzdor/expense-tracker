@@ -9,7 +9,6 @@ export default function HomePage() {
       {user?.userName ? (
         <div>
           <h1>Welcome {user?.userName}!</h1>
-
           <button onClick={logout}></button>
         </div>
       ) : (
