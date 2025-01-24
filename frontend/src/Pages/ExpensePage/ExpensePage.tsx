@@ -14,13 +14,14 @@ type Expense = {
 
 export default function ExpensePage() {
   const [expenses, setExpenses] = useState<Array<Expense>>([]);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     getExpenses();
   }, []);
 
   const getExpenses = () => {
-    getExpensesApi()
+    getExpensesApi(page)
       .then((response) => {
         if (response?.data) {
           setExpenses(response.data);
@@ -32,15 +33,42 @@ export default function ExpensePage() {
   const handleCreateExpense = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    createExpenseApi(formData).then((response) => {
-      if (response?.data) {
-        getExpenses();
-      }
-    });
+    createExpenseApi(formData)
+      .then((response) => {
+        if (response?.data) {
+          getExpenses();
+        }
+      })
+      .catch((e) => console.error(e));
+  };
+
+  const handleNextExpenses = () => {
+    getExpensesApi(page + 1)
+      .then((response) => {
+        if (response?.data) {
+          setExpenses(response.data);
+          setPage(page + 1);
+        }
+      })
+      .catch((e) => console.log(e));
+  };
+
+  const handlePrevExpenses = () => {
+    getExpensesApi(page - 1)
+      .then((response) => {
+        if (response?.data) {
+          setExpenses(response.data);
+          setPage(page - 1);
+        }
+      })
+      .catch((e) => console.log(e));
   };
 
   return (
     <div className="expense-container">
+      <button onClick={handlePrevExpenses} disabled={page == 1}>
+        Prev
+      </button>
       <div className="expense-list">
         {expenses.map((expense: Expense) => (
           <div className="expense-items" key={expense.id}>
@@ -75,6 +103,9 @@ export default function ExpensePage() {
           </form>
         </div>
       </div>
+      <button onClick={handleNextExpenses} disabled={expenses.length == 0}>
+        Next
+      </button>
     </div>
   );
 }

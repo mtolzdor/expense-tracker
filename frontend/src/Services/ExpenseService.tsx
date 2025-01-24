@@ -2,9 +2,9 @@ import axios from "axios";
 
 const apiUrl = "http://localhost:5294/api/expenses";
 
-export const getExpensesApi = async () => {
+export const getExpensesApi = async (page: number) => {
   try {
-    const response = await axios.get(`${apiUrl}?page=1`);
+    const response = await axios.get(`${apiUrl}?page=${page}`);
     return response;
   } catch (error) {
     console.error(error);
