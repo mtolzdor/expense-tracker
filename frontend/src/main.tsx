@@ -4,7 +4,7 @@ import App from "./App.tsx";
 import { BrowserRouter, Routes } from "react-router";
 import { Route } from "react-router";
 import LoginPage from "./Pages/LoginPage/LoginPage.tsx";
-import HomePage from "./Pages/HomePage.tsx";
+import HomePage from "./Pages/HomePage/HomePage.tsx";
 import RegisterPage from "./Pages/RegisterPage/RegisterPage.tsx";
 import ExpensePage from "./Pages/ExpensePage/ExpensePage.tsx";
 import ProtectRoute from "./Components/ProtectedRoute.tsx";

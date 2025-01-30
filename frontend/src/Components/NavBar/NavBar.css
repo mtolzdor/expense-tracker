@@ -1,0 +1,35 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #d7d9db;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-items {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-items button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.nav-items button:hover {
+    text-decoration: underline;
+}
