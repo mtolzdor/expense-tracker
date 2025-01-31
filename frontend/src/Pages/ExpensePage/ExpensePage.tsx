@@ -4,6 +4,7 @@ import {
   createExpenseApi,
   getExpensesApi,
 } from "../../Services/ExpenseService";
+import ExpenseForm from "../../Components/CreateExpenseForm/ExpenseForm";
 
 type Expense = {
   id: number;
@@ -69,40 +70,30 @@ export default function ExpensePage() {
       <button onClick={handlePrevExpenses} disabled={page == 1}>
         Prev
       </button>
-      <div className="expense-list">
-        {expenses.map((expense: Expense) => (
-          <div className="expense-items" key={expense.id}>
-            <h3>{expense.catagoryName}</h3>
-            <div>${expense.price}</div>
-          </div>
-        ))}
-        <div className="new-expense">
-          <form className="expense-form" onSubmit={handleCreateExpense}>
-            <label htmlFor="catagoryId">Catagory:</label>
-            <select id="catagoryId" name="catagoryId" defaultValue={1}>
-              <option value="1">Groceries</option>
-              <option value="2">Leisure</option>
-              <option value="3">Electronics</option>
-              <option value="4">Utilities</option>
-              <option value="5">Clothing</option>
-              <option value="6">Health</option>
-              <option value="7">Others</option>
-            </select>
-            <label htmlFor="price">Price:</label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              min="0.01"
-              step="0.01"
-              placeholder="$0.00"
-            ></input>
-            <label htmlFor="purchaseDate">Date:</label>
-            <input type="date" id="purchaseDate" name="purchaseDate"></input>
-            <button type="submit">Add Expense</button>
-          </form>
-        </div>
-      </div>
+      <table className="expense-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Catagory</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {expenses.map((expense: Expense) => (
+            <tr key={expense.id}>
+              <td>
+                {expense.purchaseDate
+                  .toString()
+                  .split("T")[0]
+                  .replace(/-/g, "/")}
+              </td>
+              <td className="expense-item">{expense.catagoryName}</td>
+              <td className="expense-item">${expense.price}</td>
+            </tr>
+          ))}
+          <ExpenseForm onCreateExpense={handleCreateExpense} />
+        </tbody>
+      </table>
       <button onClick={handleNextExpenses} disabled={expenses.length == 0}>
         Next
       </button>

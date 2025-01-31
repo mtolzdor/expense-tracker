@@ -5,7 +5,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export default function ProtectRoute({ children }: Props) {
+export default function ProtectedRoute({ children }: Props) {
   const { isLoggedIn } = useAuth();
   const location = useLocation();
 
