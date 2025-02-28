@@ -23,15 +23,18 @@ namespace api.Repositorys
             return expense;
         }
 
-        public async void DeleteExpenseAsync(AppUser user, int id)
+        public async Task<Expense?> DeleteExpenseAsync(AppUser user, int id)
         {
             var expense = await _context.Expenses.FirstOrDefaultAsync(x => x.UserId == user.Id && x.Id == id);
 
-            if (expense != null)
+            if (expense == null)
             {
-                _context.Expenses.Remove(expense);
-                await _context.SaveChangesAsync();
+                return null;
             }
+
+            _context.Expenses.Remove(expense);
+            await _context.SaveChangesAsync();
+            return expense;
 
         }
 
@@ -42,7 +45,7 @@ namespace api.Repositorys
 
         public async Task<List<Expense>> GetExpensesAsync(AppUser user, QueryObject query)
         {
-            var expenses = _context.Expenses
+            IQueryable<Expense> expenses = _context.Expenses
             .Where(x => x.UserId == user.Id)
             .Select(e => new Expense
             {
@@ -53,7 +56,7 @@ namespace api.Repositorys
                 PurchaseDate = e.PurchaseDate,
                 User = e.User,
                 Catagory = e.Catagory
-            });
+            }).OrderBy(e => e.PurchaseDate);
 
             if (!string.IsNullOrWhiteSpace(query.CatagoryName))
             {

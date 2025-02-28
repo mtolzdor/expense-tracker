@@ -9,6 +9,8 @@ import RegisterPage from "./Pages/RegisterPage/RegisterPage.tsx";
 import ExpensePage from "./Pages/ExpensePage/ExpensePage.tsx";
 import ProtectRoute from "./Components/ProtectedRoute.tsx";
 import ProtectedRoute from "./Components/ProtectedRoute.tsx";
+import ExpenseForm from "./Components/ExpenseForm/ExpenseForm.tsx";
+import ExpenseFormPage from "./Pages/ExpenseFormPage/ExpenseFormPage.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -21,10 +23,14 @@ createRoot(document.getElementById("root")!).render(
           <Route
             path="/expenses"
             element={
-              <ProtectedRoute>
+              <ProtectRoute>
                 <ExpensePage />
-              </ProtectedRoute>
+              </ProtectRoute>
             }
+          />
+          <Route
+            path="/ExpenseForm"
+            element={<ExpenseFormPage></ExpenseFormPage>}
           />
         </Route>
       </Routes>

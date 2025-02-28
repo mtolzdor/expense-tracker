@@ -85,16 +85,6 @@ namespace api.controllers
 
             var expenseModel = expenseDto.ToExpenseFromCreate(currentUser.Id);
 
-            /*
-            var expenseModel = new Expense
-            {
-                UserId = currentUser.Id,
-                CatagoryId = expenseDto.CatagoryId,
-                PurchaseDate = expenseDto.PurchaseDate,
-                Price = expenseDto.Price
-            };
-            */
-
             await _expenseRepo.CreateExpenseAsync(expenseModel);
             return Ok();
             //return CreatedAtAction(nameof(GetExpense), new { id = expenseModel.Id }, expenseModel.ToExpenseDto());
@@ -104,11 +94,6 @@ namespace api.controllers
         [Authorize]
         public async Task<IActionResult> UpdateExpense([FromRoute] int id, [FromBody] UpdateExpenseDto expenseDto)
         {
-
-            if (id != expenseDto.Id)
-            {
-                return BadRequest();
-            }
 
             if (!ModelState.IsValid)
             {
@@ -142,14 +127,12 @@ namespace api.controllers
                 return BadRequest("Account not found");
             }
 
-            var expense = _expenseRepo.GetExpenseByIdAsync(id);
+            var expense = await _expenseRepo.DeleteExpenseAsync(currentUser, id);
 
             if (expense == null)
             {
                 return NotFound();
             }
-
-            _expenseRepo.DeleteExpenseAsync(currentUser, id);
 
             return NoContent();
 

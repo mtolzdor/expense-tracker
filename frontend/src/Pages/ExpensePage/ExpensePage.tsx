@@ -1,102 +1,90 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import "./ExpensePage.css";
 import {
-  createExpenseApi,
+  deleteExpenseApi,
   getExpensesApi,
+  updateExpenseApi,
 } from "../../Services/ExpenseService";
-import ExpenseForm from "../../Components/CreateExpenseForm/ExpenseForm";
-
-type Expense = {
-  id: number;
-  catagoryName: string;
-  price: number;
-  purchaseDate: Date;
-};
+import { Expense } from "../../Types/Types";
+import { NavLink } from "react-router";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete, MdAddBox } from "react-icons/md";
+import { Tooltip } from "react-tooltip";
+import ExpenseForm from "../../Components/ExpenseForm/ExpenseForm";
+import ExpenseList from "./Components/ExpenseList";
 
 export default function ExpensePage() {
   const [expenses, setExpenses] = useState<Array<Expense>>([]);
   const [page, setPage] = useState(1);
+  const [isEditing, setEditing] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [updateExpense, setUpdateExpense] = useState<Expense | null>(null);
 
   useEffect(() => {
     getExpenses();
-  }, []);
+  }, [page]);
 
   const getExpenses = () => {
     getExpensesApi(page)
       .then((response) => {
         if (response?.data) {
-          setExpenses(response.data);
+          const data = response.data.map((expense: Expense) => ({
+            ...expense,
+            isEditing: false,
+          }));
+          setExpenses(data);
         }
       })
       .catch((e) => console.error(e));
   };
 
-  const handleCreateExpense = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    createExpenseApi(formData)
-      .then((response) => {
-        if (response?.data) {
-          getExpenses();
-        }
-      })
-      .catch((e) => console.error(e));
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {};
+
+  const handleToggleUpdate = (ex: Expense) => {
+    setEditing(true);
   };
 
-  const handleNextExpenses = () => {
-    getExpensesApi(page + 1)
-      .then((response) => {
-        if (response?.data) {
-          setExpenses(response.data);
-          setPage(page + 1);
-        }
-      })
-      .catch((e) => console.log(e));
+  const handleDeleteExpense = (id: number) => {
+    console.log(id);
+    deleteExpenseApi(id);
   };
 
-  const handlePrevExpenses = () => {
-    getExpensesApi(page - 1)
-      .then((response) => {
-        if (response?.data) {
-          setExpenses(response.data);
-          setPage(page - 1);
-        }
-      })
-      .catch((e) => console.log(e));
+  const handleUpdateExpense = (id: number, formData: Expense) => {
+    updateExpenseApi(
+      id,
+      formData.catagoryId,
+      formData.purchaseDate,
+      formData.price
+    );
   };
 
   return (
     <div className="expense-container">
-      <button onClick={handlePrevExpenses} disabled={page == 1}>
-        Prev
-      </button>
-      <table className="expense-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Catagory</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenses.map((expense: Expense) => (
-            <tr key={expense.id}>
-              <td>
-                {expense.purchaseDate
-                  .toString()
-                  .split("T")[0]
-                  .replace(/-/g, "/")}
-              </td>
-              <td className="expense-item">{expense.catagoryName}</td>
-              <td className="expense-item">${expense.price}</td>
-            </tr>
-          ))}
-          <ExpenseForm onCreateExpense={handleCreateExpense} />
-        </tbody>
-      </table>
-      <button onClick={handleNextExpenses} disabled={expenses.length == 0}>
-        Next
-      </button>
+      <ExpenseList
+        expenses={expenses}
+        onUpdateExpense={handleUpdateExpense}
+        onDeleteExpense={handleDeleteExpense}
+      ></ExpenseList>
+      <div className="expense-menu">
+        <NavLink data-tooltip-content={"Add Expense"} to="/ExpenseForm">
+          <button>Add</button>
+        </NavLink>
+        <button>Edit</button>
+        <button>Delete</button>
+      </div>
+      <div className="pagination">
+        <button onClick={() => setPage(page - 1)} disabled={page == 1}>
+          Prev
+        </button>
+        <button
+          onClick={() => setPage(page + 1)}
+          disabled={expenses.length == 0}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

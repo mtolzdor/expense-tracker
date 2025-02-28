@@ -10,6 +10,6 @@ namespace api.Interfaces
         Task<List<Expense>> GetExpensesAsync(AppUser user, QueryObject query);
         Task<Expense> CreateExpenseAsync(Expense expense);
         Task<Expense?> UpdateExpenseAsync(int id, UpdateExpenseDto expense);
-        void DeleteExpenseAsync(AppUser user, int id);
+        Task<Expense?> DeleteExpenseAsync(AppUser user, int id);
     }
 }

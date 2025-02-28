@@ -1,6 +1,6 @@
 import axios from "axios";
-import React from "react";
-import { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 type Props = {
@@ -36,6 +36,12 @@ export const UserProvider = ({ children }: Props) => {
     const token = localStorage.getItem("token");
 
     if (user && token) {
+      const tokenDate = JSON.parse(atob(token.split(".")[1]));
+      console.log(tokenDate.exp);
+      if (tokenDate.exp > new Date().getTime()) {
+        //logout();
+        console.log("Fix token expiration check");
+      }
       setUser(JSON.parse(user));
       setToken(token);
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
@@ -111,4 +117,4 @@ export const UserProvider = ({ children }: Props) => {
   );
 };
 
-export const useAuth = () => React.useContext(UserContext);
+export const useAuth = () => useContext(UserContext);

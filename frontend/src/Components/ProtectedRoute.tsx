@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from "react-router";
+import { Navigate } from "react-router";
 import { useAuth } from "../Context/useAuth";
 
 type Props = {
@@ -7,11 +7,9 @@ type Props = {
 
 export default function ProtectedRoute({ children }: Props) {
   const { isLoggedIn } = useAuth();
-  const location = useLocation();
 
   if (!isLoggedIn()) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" replace={true} />;
   }
-
   return <>{children}</>;
 }
