@@ -45,7 +45,7 @@ namespace api.Repositorys
 
         public async Task<List<Expense>> GetExpensesAsync(AppUser user, QueryObject query)
         {
-            IQueryable<Expense> expenses = _context.Expenses
+            var expenses = _context.Expenses
             .Where(x => x.UserId == user.Id)
             .Select(e => new Expense
             {
@@ -56,7 +56,7 @@ namespace api.Repositorys
                 PurchaseDate = e.PurchaseDate,
                 User = e.User,
                 Catagory = e.Catagory
-            }).OrderBy(e => e.PurchaseDate);
+            });
 
             if (!string.IsNullOrWhiteSpace(query.CatagoryName))
             {
@@ -87,7 +87,7 @@ namespace api.Repositorys
 
             var skipNumber = (query.Page - 1) * query.PageSize;
 
-            return await expenses.Skip(skipNumber).Take(query.PageSize).ToListAsync();
+            return await expenses.Skip(skipNumber).Take(query.PageSize).OrderBy(e => e.Id).ToListAsync();
         }
 
         public async Task<Expense?> UpdateExpenseAsync(int id, UpdateExpenseDto expenseDto)

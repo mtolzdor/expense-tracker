@@ -1,6 +1,6 @@
 import { Fragment } from "react/jsx-runtime";
-import { Expense } from "../../../Types/Types";
-import ExpenseItem from "./ExpenseItem";
+import { Expense } from "../../../../Types/Types";
+import ExpenseItem from "../ExpenseItem/ExpenseItem";
 import "./ExpenseList.css";
 
 type props = {
@@ -15,8 +15,8 @@ export default function ExpenseList({
   onDeleteExpense,
 }: props) {
   return (
-    <div className="expense-flex">
-      <div className="expense-flex-header">
+    <div className="expense-list-container">
+      <div className="expense-list-header">
         <span>Date</span>
         <span>Catagory</span>
         <span>Price</span>
