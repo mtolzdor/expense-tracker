@@ -1,8 +1,7 @@
 import { Outlet } from "react-router";
-import { UserProvider } from "./Context/useAuth";
-import NavBar from "./Components/NavBar/NavBar";
+import { UserProvider } from "./context/useAuth";
+import NavBar from "./components/NavBar/NavBar";
 import "./App.css";
-import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
   return (

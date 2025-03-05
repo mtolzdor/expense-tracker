@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { Expense } from "../../../../Types/Types";
+import { Expense } from "../../../../types/Types";
 import "./ExpenseItem.css";
 import { useState } from "react";
 

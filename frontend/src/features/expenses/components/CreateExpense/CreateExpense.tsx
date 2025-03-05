@@ -1,27 +1,33 @@
+import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
-import { Expense } from "../../Types/Types";
+import "./CreateExpense.css";
+import { createExpenseApi } from "../../api/ExpenseService";
 
-//update props
-type Props = {
-  onUpdateExpense: any;
-  expense: Expense;
+type ExpenseForm = {
+  purchaseDate: Date;
+  catagoryId: number;
+  price: number;
 };
 
-export default function ExpenseForm({ expense, onUpdateExpense }: Props) {
-  const { register, handleSubmit } = useForm({
-    defaultValues: {
-      purchaseDate: new Date(expense.purchaseDate).toISOString().split("T")[0],
-      price: expense.price,
-      catagoryId: expense.catagoryId,
-    },
-  });
+export default function CreateExpense() {
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm<ExpenseForm>();
+
+  const handleCreateExpense = (formData: ExpenseForm) => {
+    createExpenseApi(
+      formData.catagoryId,
+      formData.purchaseDate,
+      formData.price
+    );
+    navigate("/expenses");
+  };
 
   return (
     <div className="expense-form-container">
       <div className="expense-items">
         <form
           className="expense-form"
-          onSubmit={() => handleSubmit(onUpdateExpense(expense.id))}
+          onSubmit={handleSubmit(handleCreateExpense)}
         >
           <label htmlFor="purchaseDate">Date:</label>
           <input
@@ -48,7 +54,7 @@ export default function ExpenseForm({ expense, onUpdateExpense }: Props) {
             placeholder="$0.00"
             {...register("price")}
           ></input>
-          <button type="submit">Update Expense</button>
+          <button type="submit">Add Expense</button>
         </form>
       </div>
     </div>

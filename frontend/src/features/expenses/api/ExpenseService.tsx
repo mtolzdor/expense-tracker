@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Expense } from "../Types/Types";
 
 const apiUrl = "http://localhost:5294/api/expenses";
 

@@ -1,8 +1,8 @@
 import { NavLink } from "react-router";
-import { useAuth } from "../../Context/useAuth";
-import "./HomePage.css";
+import "./Home.css";
+import { useAuth } from "../../../../context/useAuth";
 
-export default function HomePage() {
+export default function Home() {
   const { user } = useAuth();
 
   return (

@@ -10,7 +10,7 @@ type Props = {
 type AuthContext = {
   user: User | null;
   token: string | null;
-  register: (email: string, username: string, password: string) => void;
+  registerUser: (email: string, username: string, password: string) => void;
   login: (username: string, password: string) => void;
   logout: () => void;
   isLoggedIn: () => boolean;
@@ -36,12 +36,15 @@ export const UserProvider = ({ children }: Props) => {
     const token = localStorage.getItem("token");
 
     if (user && token) {
+      //implement token exp check
+      /*
       const tokenDate = JSON.parse(atob(token.split(".")[1]));
       console.log(tokenDate.exp);
       if (tokenDate.exp > new Date().getTime()) {
         //logout();
-        console.log("Fix token expiration check");
+    
       }
+      */
       setUser(JSON.parse(user));
       setToken(token);
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
@@ -49,7 +52,7 @@ export const UserProvider = ({ children }: Props) => {
     setIsReady(true);
   }, []);
 
-  const register = async (
+  const registerUser = async (
     email: string,
     username: string,
     password: string
@@ -110,7 +113,7 @@ export const UserProvider = ({ children }: Props) => {
 
   return (
     <UserContext.Provider
-      value={{ login, user, token, logout, isLoggedIn, register }}
+      value={{ login, user, token, logout, isLoggedIn, registerUser }}
     >
       {isReady ? children : null}
     </UserContext.Provider>

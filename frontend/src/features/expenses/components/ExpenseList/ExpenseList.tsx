@@ -1,5 +1,5 @@
 import { Fragment } from "react/jsx-runtime";
-import { Expense } from "../../../../Types/Types";
+import { Expense } from "../../../../types/Types";
 import ExpenseItem from "../ExpenseItem/ExpenseItem";
 import "./ExpenseList.css";
 

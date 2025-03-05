@@ -3,14 +3,12 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import { BrowserRouter, Routes } from "react-router";
 import { Route } from "react-router";
-import LoginPage from "./Pages/LoginPage/LoginPage.tsx";
-import HomePage from "./Pages/HomePage/HomePage.tsx";
-import RegisterPage from "./Pages/RegisterPage/RegisterPage.tsx";
-import ExpensePage from "./Pages/ExpensePage/ExpensePage.tsx";
-import ProtectRoute from "./Components/ProtectedRoute.tsx";
-import ProtectedRoute from "./Components/ProtectedRoute.tsx";
-import ExpenseForm from "./Components/ExpenseForm/ExpenseForm.tsx";
-import ExpenseFormPage from "./Pages/ExpenseFormPage/ExpenseFormPage.tsx";
+import Expenses from "./features/expenses/components/Expenses/Expenses.tsx";
+import CreateExpense from "./features/expenses/components/CreateExpense/CreateExpense.tsx";
+import HomePage from "./features/home/components/HomePage/Home.tsx";
+import Login from "./features/auth/components/Login/Login.tsx";
+import Register from "./features/auth/components/Register/Register.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -18,19 +16,19 @@ createRoot(document.getElementById("root")!).render(
       <Routes>
         <Route path="/" element={<App />}>
           <Route path="" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/expenses"
             element={
-              <ProtectRoute>
-                <ExpensePage />
-              </ProtectRoute>
+              <ProtectedRoute>
+                <Expenses />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/ExpenseForm"
-            element={<ExpenseFormPage></ExpenseFormPage>}
+            element={<CreateExpense></CreateExpense>}
           />
         </Route>
       </Routes>

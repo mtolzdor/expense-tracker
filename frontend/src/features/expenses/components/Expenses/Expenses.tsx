@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import "./ExpensePage.css";
+import "./Expenses.css";
 import {
   deleteExpenseApi,
   getExpensesApi,
   updateExpenseApi,
-} from "../../Services/ExpenseService";
-import { Expense } from "../../Types/Types";
+} from "../../api/ExpenseService";
+import { Expense } from "../../../../types/Types";
 import { NavLink } from "react-router";
-import ExpenseList from "./Components/ExpenseList/ExpenseList";
+import ExpenseList from "../ExpenseList/ExpenseList";
 
-export default function ExpensePage() {
+export default function Expenses() {
   const [expenses, setExpenses] = useState<Array<Expense>>([]);
   const [page, setPage] = useState(1);
 
@@ -20,9 +20,8 @@ export default function ExpensePage() {
   const getExpenses = () => {
     getExpensesApi(page)
       .then((response) => {
-        const data = response?.data;
-        if (data) {
-          setExpenses(data);
+        if (response?.data) {
+          setExpenses(response?.data);
         }
       })
       .catch((e) => console.error(e));
