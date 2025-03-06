@@ -52,7 +52,6 @@ export default function ExpenseItem({
             {...register("purchaseDate")}
             disabled={editing}
           ></input>
-          {/*fix defualt value for select box*/}
           <select
             id="catagoryId"
             {...register("catagoryId")}

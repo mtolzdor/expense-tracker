@@ -57,6 +57,7 @@ namespace api.controllers
             var expenseDto = expenses.Select(e => new ExpenseDto
             {
                 Id = e.Id,
+                CatagoryId = e.CatagoryId,
                 CatagoryName = e.Catagory.Name,
                 PurchaseDate = e.PurchaseDate,
                 Price = e.Price
